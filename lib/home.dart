@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool darkMode = false;
 
+  bool completed = false;
+
   Brightness? brightness;
 
   @override
@@ -44,6 +46,35 @@ class _HomeScreenState extends State<HomeScreen> {
     
   }
   int _selectedIndex = 0;
+
+  void confirmDelete(BuildContext context, Todo todo) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Confirm Delete'),
+      content: const Text('Are you sure you want to delete this todo?'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cancel', style: TextStyle(
+            color: Colors.red
+          ),),
+        ),
+        TextButton(
+          onPressed: () {
+            removeTodo(todo);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Delete', style: TextStyle(
+            color: Colors.green
+          )),
+        ),
+      ],
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -171,44 +202,88 @@ class _HomeScreenState extends State<HomeScreen> {
             return ListView.builder(
                 itemCount: state.todos.length,
                 itemBuilder: (context, int i) {
-                  return Card(
-                    color: darkMode ? Colors.white : Theme.of(context).colorScheme.primary,
-                    elevation: 1,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Slidable(
-                      key: const ValueKey(0),
-                      startActionPane: ActionPane(
-                        motion: const ScrollMotion(),
-                        children: [
-                          SlidableAction(
-                            onPressed: (_) {
-                              removeTodo(state.todos[i]);
-                            },
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            icon: Icons.delete,
-                            label: 'Delete',
-                          )
-                        ],
+                  if ( state.todos[i].isDone && completed) {
+                    return Card(
+                      color: darkMode ? Colors.white : Theme.of(context).colorScheme.primary,
+                      elevation: 1,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: ListTile(
-                        title: Text(state.todos[i].title),
-                        subtitle: Text(state.todos[i].subTitle),
-                        trailing: Checkbox(
-                          checkColor: darkMode ? Colors.white : Colors.black,
-                          value: state.todos[i].isDone,
-                          activeColor: darkMode ? Colors.black : Colors.white,
-                          side: BorderSide(color: Colors.black),
-                          onChanged: (value) {
-                            alterTodo(i);
-                          },
+                      child: Slidable(
+                        key: const ValueKey(0),
+                        startActionPane: ActionPane(
+                          motion: const ScrollMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (_) {
+                                confirmDelete(context, state.todos[i]);
+                              },
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              icon: Icons.delete,
+                              label: 'Delete',
+                            )
+                          ],
+                        ),
+                        child: ListTile(
+                          title: Text(state.todos[i].title),
+                          subtitle: Text(state.todos[i].subTitle),
+                          trailing: Checkbox(
+                            checkColor: darkMode ? Colors.white : Colors.black,
+                            value: state.todos[i].isDone,
+                            activeColor: darkMode ? Colors.black : Colors.white,
+                            side:const BorderSide(color: Colors.black),
+                            onChanged: (value) {
+                              alterTodo(i);
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                });
+                    );
+                  }
+
+                  if (!completed && !state.todos[i].isDone) {
+                    return Card(
+                      color: darkMode ? Colors.white : Theme.of(context).colorScheme.primary,
+                      elevation: 1,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Slidable(
+                        key: const ValueKey(0),
+                        startActionPane: ActionPane(
+                          motion: const ScrollMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (_) {
+                                confirmDelete(context, state.todos[i]);
+                              },
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              icon: Icons.delete,
+                              label: 'Delete',
+                            )
+                          ],
+                        ),
+                        child: ListTile(
+                          title: Text(state.todos[i].title),
+                          subtitle: Text(state.todos[i].subTitle),
+                          trailing: Checkbox(
+                            checkColor: darkMode ? Colors.white : Colors.black,
+                            value: state.todos[i].isDone,
+                            activeColor: darkMode ? Colors.black : Colors.white,
+                            side:const BorderSide(color: Colors.black),
+                            onChanged: (value) {
+                              alterTodo(i);
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return null;
+                }
+              );
           } else if (state.status == TodoStatus.initial) {
             return const Center(
               child: Text('Initial'),
@@ -225,19 +300,25 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
+            if (index == 0) {
+              completed = false;
+            } else if (index == 1) {
+              completed = true;
+            }
+            
           });
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.check),
-            label: 'Completed',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.radio_button_unchecked),
             label: 'Incompleted',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check),
+            label: 'Completed',
+          ),
         ],
-        selectedItemColor: Colors.black,
+        selectedItemColor: Colors.green,
       ),     
     );
   }

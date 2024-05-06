@@ -18,17 +18,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Todo Bloc',
-      theme: ThemeData(
-          colorScheme: const ColorScheme.light(
+    ThemeData darkTheme = ThemeData(
+      brightness: Brightness.dark,
+      colorScheme: const ColorScheme.dark(
+        background: Colors.black, 
+        onBackground: Colors.white, 
+        primary: Colors.orange, 
+        onPrimary: Colors.black, 
+        secondary: Colors.green, 
+        onSecondary: Colors.white, 
+      ),
+    );
+
+    ThemeData lightTheme = ThemeData(
+      brightness: Brightness.light, 
+      colorScheme: const ColorScheme.light(
         background: Colors.white,
         onBackground: Colors.black,
         primary: Colors.yellowAccent,
         onPrimary: Colors.black,
         secondary: Colors.lightGreen,
         onSecondary: Colors.white,
-      )),
+      ),
+    );
+
+    return MaterialApp(
+      title: 'Todo Bloc',
+      theme: lightTheme, 
+      darkTheme: darkTheme,
       home: BlocProvider<TodoBloc>(
         create: (context) => TodoBloc()..add(TodoStarted()),
         child: const HomeScreen(),

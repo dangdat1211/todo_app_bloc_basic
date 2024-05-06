@@ -31,10 +31,24 @@ class _HomeScreenState extends State<HomeScreen> {
         );
   }
 
+  bool darkMode = false;
+
+  Brightness? brightness;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      darkMode = MediaQuery.of(context).platformBrightness == Brightness.dark;
+   });
+    
+  }
+  int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: darkMode ? Colors.black : Theme.of(context).colorScheme.background,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -122,14 +136,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               });
         },
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: darkMode ? Colors.white : Theme.of(context).colorScheme.primary,
         child: const Icon(
           CupertinoIcons.add,
           color: Colors.black,
         ),
       ),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: darkMode ? Colors.white : Theme.of(context).colorScheme.primary,
         elevation: 0,
         title: const Text(
           'Todo App',
@@ -138,6 +152,17 @@ class _HomeScreenState extends State<HomeScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: <Widget> [
+          Switch(
+            value: darkMode, 
+            onChanged: (value) {
+              setState(() {
+                darkMode = !darkMode;
+              });
+            },
+            activeColor: Colors.black,
+          )
+        ]
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -147,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: state.todos.length,
                 itemBuilder: (context, int i) {
                   return Card(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: darkMode ? Colors.white : Theme.of(context).colorScheme.primary,
                     elevation: 1,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -172,8 +197,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: Text(state.todos[i].title),
                         subtitle: Text(state.todos[i].subTitle),
                         trailing: Checkbox(
+                          checkColor: darkMode ? Colors.white : Colors.black,
                           value: state.todos[i].isDone,
-                          activeColor: Theme.of(context).colorScheme.secondary,
+                          activeColor: darkMode ? Colors.black : Colors.white,
+                          side: BorderSide(color: Colors.black),
                           onChanged: (value) {
                             alterTodo(i);
                           },
@@ -193,6 +220,25 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check),
+            label: 'Completed',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.radio_button_unchecked),
+            label: 'Incompleted',
+          ),
+        ],
+        selectedItemColor: Colors.black,
+      ),     
     );
   }
 }

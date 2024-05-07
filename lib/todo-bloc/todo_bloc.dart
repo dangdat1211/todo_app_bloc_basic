@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:faker/faker.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:meta/meta.dart';
 import '../model/todo.dart';
@@ -118,21 +117,4 @@ class TodoBloc extends HydratedBloc<TodoEvent, TodoState> {
 		 return state.toJson();
 	 }
 
-
-  @override
-  TodoState initial() {
-    return TodoState.initial(generateInitialTodos()); 
-  }
-
-  List<Todo> generateInitialTodos() {
-    final faker = Faker(provider: FakerDataProviderFa()); // Create a Faker instance
-    final todos = List<Todo>.generate(10, (index) {
-      return Todo(
-        title: faker.lorem.word(),
-        subTitle: faker.lorem.word(),
-        isDone: random.boolean(),
-      );
-    });
-    return todos;
-  }
 }
